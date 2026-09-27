@@ -1,0 +1,22 @@
+{
+  "name": "grade-score-import",
+  "version": "1.0.0",
+  "description": "教育成绩大表导入：行级校验、分批上送市级平台、异常行下载重传、任务持久化恢复",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "gen-sample": "node scripts/gen-sample.js 30000",
+    "test": "node test/e2e.js"
+  },
+  "keywords": ["education", "score", "import", "batch", "city-platform"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csv-parse": "^7.0.3",
+    "express": "^5.2.1",
+    "iconv-lite": "^0.7.3",
+    "multer": "^2.4.0",
+    "xlsx": "^0.18.5"
+  }
+}

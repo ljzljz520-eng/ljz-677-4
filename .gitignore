@@ -23,3 +23,7 @@ __pycache__/
 *.log
 .env
 .env.*
+
+# 运行数据
+data/
+!data/.gitkeep

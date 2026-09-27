@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>成绩大表导入 · 市级报送平台</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">📊</span>
+      <div>
+        <h1>成绩大表导入</h1>
+        <p>区县级成绩报送 · 校验 / 分批上送 / 异常重传</p>
+      </div>
+    </div>
+    <nav id="nav"></nav>
+  </header>
+
+  <main id="app"><div class="loading">加载中…</div></main>
+
+  <div id="toast" class="toast"></div>
+  <input type="file" id="reuploadInput" accept=".csv,.xlsx,.xls" hidden />
+  <script src="/app.js"></script>
+</body>
+</html>
