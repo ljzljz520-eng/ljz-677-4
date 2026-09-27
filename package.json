@@ -1,0 +1,16 @@
+{
+  "name": "score-import",
+  "version": "1.0.0",
+  "description": "教育成绩大表导入与分批上送市级平台系统",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "11.10.0",
+    "express": "4.22.3",
+    "iconv-lite": "0.4.24",
+    "multer": "1.4.5-lts.2",
+    "xlsx": "0.18.5"
+  }
+}

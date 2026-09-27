@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>教育成绩大表导入 · 市级平台上送</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --blue: #2563eb; --blue-d: #1d4ed8; --bg: #f1f5f9; --card: #fff;
+  --border: #e2e8f0; --text: #1e293b; --muted: #64748b;
+  --green: #16a34a; --red: #dc2626; --amber: #d97706; --purple: #7c3aed;
+}
+body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); font-size: 14px; }
+header { background: linear-gradient(135deg, #1e40af, #2563eb); color: #fff; padding: 16px 28px; display: flex; align-items: center; gap: 12px; }
+header h1 { font-size: 18px; font-weight: 600; }
+header .sub { opacity: .8; font-size: 12px; }
+.container { max-width: 1200px; margin: 24px auto; padding: 0 20px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+.card h2 { font-size: 15px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.row { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 12px; color: var(--muted); }
+input[type=text], select { border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-size: 14px; min-width: 200px; outline: none; }
+input[type=text]:focus, select:focus { border-color: var(--blue); }
+button { border: none; border-radius: 6px; padding: 8px 16px; font-size: 13px; cursor: pointer; font-weight: 500; transition: .15s; }
+.btn-primary { background: var(--blue); color: #fff; }
+.btn-primary:hover { background: var(--blue-d); }
+.btn-primary:disabled { background: #94a3b8; cursor: not-allowed; }
+.btn-ghost { background: #fff; border: 1px solid var(--border); color: var(--text); }
+.btn-ghost:hover { border-color: var(--blue); color: var(--blue); }
+.btn-danger { background: #fff; border: 1px solid #fecaca; color: var(--red); }
+.btn-danger:hover { background: #fef2f2; }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.dropzone { border: 2px dashed #cbd5e1; border-radius: 8px; padding: 22px; text-align: center; color: var(--muted); cursor: pointer; transition: .15s; margin-top: 14px; }
+.dropzone:hover, .dropzone.drag { border-color: var(--blue); background: #eff6ff; color: var(--blue); }
+.dropzone .fname { color: var(--text); font-weight: 600; }
+.hint { font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.8; }
+.hint code { background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
+.tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+.tab { padding: 6px 14px; border-radius: 20px; background: #f1f5f9; color: var(--muted); cursor: pointer; font-size: 13px; border: none; }
+.tab.active { background: var(--blue); color: #fff; }
+.tab .badge { display: inline-block; background: rgba(0,0,0,.15); border-radius: 10px; padding: 0 7px; margin-left: 4px; font-size: 11px; }
+.tab.active .badge { background: rgba(255,255,255,.25); }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 13px; }
+th { color: var(--muted); font-weight: 500; background: #f8fafc; white-space: nowrap; }
+tr:hover td { background: #f8fafc; }
+.status { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; white-space: nowrap; }
+.s-parsing, .s-uploading { background: #dbeafe; color: #1d4ed8; }
+.s-validated { background: #fef3c7; color: #92400e; }
+.s-upload_paused { background: #ffedd5; color: #c2410c; }
+.s-done { background: #dcfce7; color: #15803d; }
+.s-partial { background: #f3e8ff; color: #6b21a8; }
+.s-parse_failed { background: #fee2e2; color: #b91c1c; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.stat { background: #f8fafc; border-radius: 8px; padding: 14px; text-align: center; }
+.stat .num { font-size: 22px; font-weight: 700; }
+.stat .lbl { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.stat.invalid .num { color: var(--red); }
+.stat.sent .num { color: var(--green); }
+.stat.pf .num { color: var(--amber); }
+.stat.total .num { color: var(--blue); }
+.progress { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; margin: 6px 0 2px; }
+.progress > div { height: 100%; background: linear-gradient(90deg, #3b82f6, #2563eb); transition: width .4s; }
+.progress.partial > div { background: linear-gradient(90deg, #f59e0b, #d97706); }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+.empty { text-align: center; padding: 48px 0; color: var(--muted); }
+.pager { display: flex; gap: 8px; align-items: center; justify-content: flex-end; margin-top: 12px; }
+.err-text { color: var(--red); font-size: 12px; }
+.toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #fff; padding: 10px 22px; border-radius: 8px; font-size: 13px; z-index: 999; opacity: 0; transition: .3s; pointer-events: none; }
+.toast.show { opacity: 1; }
+.toast.error { background: var(--red); }
+.back-link { color: var(--blue); cursor: pointer; font-size: 13px; margin-bottom: 14px; display: inline-block; }
+.meta { color: var(--muted); font-size: 12px; line-height: 1.9; }
+.meta b { color: var(--text); }
+.alert { background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 14px; }
+.alert.warn { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+.parent-banner { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 14px; display: none; }
+.parent-banner a { color: var(--blue); cursor: pointer; text-decoration: underline; }
+.tablewrap { overflow-x: auto; }
+.dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; animation: pulse 1.2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+</style>
+</head>
+<body>
+<header>
+  <div style="font-size:24px">📊</div>
+  <div>
+    <h1>教育成绩大表导入 · 市级平台分批上送</h1>
+    <div class="sub">上传 → 校验学号 / 课程 / 分数 / 考试批次 → 分批上送 → 异常行下载重传；任务持久化，刷新页面不丢失</div>
+  </div>
+</header>
+
+<div class="container">
+  <!-- ========== 列表视图 ========== -->
+  <div id="listView">
+    <div class="card">
+      <h2>① 上传成绩文件</h2>
+      <div id="parentBanner" class="parent-banner">
+        🔁 正在修正后重传任务 <a id="parentLink"></a> 的异常行。新任务会自动关联原任务。
+        <a id="cancelParent" style="float:right">取消关联</a>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>考试批次 *</label>
+          <select id="batchSelect"></select>
+        </div>
+        <div class="field" style="flex:1;min-width:220px">
+          <label>任务名称（可留空）</label>
+          <input type="text" id="taskName" placeholder="例如：高一期中考试成绩-第一批" maxlength="120">
+        </div>
+      </div>
+      <div class="dropzone" id="dropzone">
+        <div>📁 点击选择文件，或将 <b>.xlsx / .xls / .csv</b> 文件拖拽到此处（最大 50MB，支持数万行）</div>
+        <div id="fileLabel" style="margin-top:8px"></div>
+        <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" hidden>
+      </div>
+      <div class="hint">
+        📌 文件须包含列：<code>学号</code>、<code>课程</code>、<code>分数</code>、<code>考试批次</code>（列名一致即可，顺序不限；其他列自动忽略）。
+        学号建议设为<b>文本</b>格式以防前导零丢失；CSV 自动识别 UTF-8 / GBK 编码。<br>
+        🔗 <a id="tplLink" style="color:var(--blue);cursor:pointer">下载导入模板</a>
+        &nbsp;|&nbsp; <a id="sampleLink" style="color:var(--blue);cursor:pointer">生成 5 万行示例大表（含各类异常）</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>② 历史任务 <span style="font-weight:400;font-size:12px;color:var(--muted)">（服务端持久化，关闭浏览器也可恢复查看）</span></h2>
+      <div class="tabs" id="listTabs">
+        <button class="tab active" data-tab="all">全部</button>
+        <button class="tab" data-tab="running">进行中<span class="badge" id="cnt-running"></span></button>
+        <button class="tab" data-tab="todo">待处理<span class="badge" id="cnt-todo"></span></button>
+        <button class="tab" data-tab="done">已完成<span class="badge" id="cnt-done"></span></button>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr>
+            <th>ID</th><th>任务名称</th><th>考试批次</th><th>总数</th><th>校验异常</th>
+            <th>已上送</th><th>平台拒收</th><th>状态</th><th>创建时间</th><th>操作</th>
+          </tr></thead>
+          <tbody id="taskTbody"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="listEmpty" style="display:none">暂无任务，请先上传成绩文件</div>
+    </div>
+  </div>
+
+  <!-- ========== 详情视图 ========== -->
+  <div id="detailView" style="display:none">
+    <a class="back-link" id="backLink">← 返回任务列表</a>
+    <div class="card">
+      <h2 id="detailTitle"></h2>
+      <div id="detailAlert"></div>
+      <div class="stats" id="stats"></div>
+      <div class="progress" id="progressBar"><div style="width:0%"></div></div>
+      <div class="meta" id="progressMeta"></div>
+      <div style="height:14px"></div>
+      <div class="actions" id="detailActions"></div>
+      <div class="meta" id="detailMeta"></div>
+    </div>
+
+    <div class="card">
+      <div class="tabs" id="rowTabs">
+        <button class="tab active" data-filter="all">全部</button>
+        <button class="tab" data-filter="invalid">校验异常</button>
+        <button class="tab" data-filter="valid">待上送</button>
+        <button class="tab" data-filter="sent">已上送</button>
+        <button class="tab" data-filter="platform_failed">平台拒收</button>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr>
+            <th>原始行号</th><th>学号</th><th>课程</th><th>分数</th><th>考试批次</th><th>状态</th><th>说明</th>
+          </tr></thead>
+          <tbody id="rowTbody"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="rowEmpty" style="display:none">没有符合条件的行</div>
+      <div class="pager">
+        <button class="btn-ghost btn-sm" id="prevPage">上一页</button>
+        <span id="pageInfo" class="meta"></span>
+        <button class="btn-ghost btn-sm" id="nextPage">下一页</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/app.js"></script>
+</body>
+</html>
